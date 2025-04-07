@@ -1,8 +1,19 @@
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
-import "./App.css";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "./components/ui/card";
+import { Badge } from "./components/ui/badge";
+import { Alert, AlertDescription } from "./components/ui/alert";
 
-const socket = io("http://localhost:4000"); // Replace with your backend URL
+const socket = io("http://localhost:4000");
 
 function App() {
   const [username, setUsername] = useState("");
@@ -29,7 +40,7 @@ function App() {
       console.log("Disconnected from server");
     });
 
-    socket.on("gameCreated", (data) => {
+    socket.on("gameCreated", () => {
       setGameCreated(true);
     });
 
@@ -58,7 +69,6 @@ function App() {
       setRoomFullMessage(data.message);
     });
 
-    // Clean up the socket when the component unmounts
     return () => {
       socket.off("connect");
       socket.off("disconnect");
@@ -75,14 +85,14 @@ function App() {
     }
   };
 
-  const handleCellClick = (row, col) => {
+  const handleCellClick = (row: number, col: number) => {
     if (
       !gameStarted ||
       winner ||
       board[row][col] !== "" ||
       currentPlayer !== username
     ) {
-      return; // Don't allow moves if game isn't started, is won, cell is occupied, or not their turn.
+      return;
     }
     socket.emit("makeMove", { room, row, col, username });
   };
@@ -92,53 +102,135 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {!gameStarted ? (
-        <div className="joinGameContainer">
-          <h3>Join or Create Game</h3>
-          <input
-            type="text"
-            placeholder="Username..."
-            onChange={(event) => setUsername(event.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Room ID (or create a new one)..."
-            onChange={(event) => setRoom(event.target.value)}
-          />
-          <button onClick={joinGame}>Join Game</button>
-          {roomFullMessage && <p style={{ color: "red" }}>{roomFullMessage}</p>}
-        </div>
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Tic Tac Toe</CardTitle>
+            <CardDescription>
+              Join an existing game or create a new one
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="username" className="text-sm font-medium">
+                Username
+              </label>
+              <Input
+                id="username"
+                placeholder="Enter your username"
+                onChange={(event) => setUsername(event.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="room" className="text-sm font-medium">
+                Room ID
+              </label>
+              <Input
+                id="room"
+                placeholder="Enter room ID or create a new one"
+                onChange={(event) => setRoom(event.target.value)}
+              />
+            </div>
+            {roomFullMessage && (
+              <Alert variant="destructive">
+                <AlertDescription>{roomFullMessage}</AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+          <CardFooter>
+            <Button onClick={joinGame} className="w-full">
+              Join Game
+            </Button>
+          </CardFooter>
+        </Card>
       ) : (
-        <div className="gameContainer">
-          <h1>Tic-Tac-Toe</h1>
-          <p>
-            Player 1: {players[0]} (X)
-            <br />
-            Player 2: {players[1] || "Waiting for Player 2"} (O)
-          </p>
-          {currentPlayer && <p>Current Player: {currentPlayer}</p>}
-          {winner && <p>Winner: {winner === username ? "You" : winner}</p>}
-          {isDraw && <p>It's a Draw!</p>}
-          <div className="board">
-            {board.map((row, rowIndex) => (
-              <div key={rowIndex} className="row">
-                {row.map((cell, colIndex) => (
-                  <div
-                    key={colIndex}
-                    className="cell"
-                    onClick={() => handleCellClick(rowIndex, colIndex)}
-                  >
-                    {cell}
-                  </div>
-                ))}
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">
+              Tic Tac Toe
+            </CardTitle>
+            <div className="flex justify-center space-x-6 mt-2">
+              <div className="text-center">
+                <div className="flex text-4xl font-extrabold text-white items-center justify-center size-20 rounded-full bg-red-500/90">
+                  X
+                </div>
+                <p className="text-sm font-medium">{players[0]}</p>
               </div>
-            ))}
-          </div>
-          {winner || isDraw ? (
-            <button onClick={resetGame}>Play Again</button>
-          ) : null}
-        </div>
+              <div className="text-center">
+                <div className="flex text-4xl font-extrabold text-white items-center justify-center size-20 rounded-full bg-blue-500/90">
+                  O
+                </div>
+                <p className="text-sm font-medium">
+                  {players[1] || "Waiting..."}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-center mt-2">
+              {currentPlayer && (
+                <Badge
+                  variant={currentPlayer === username ? "default" : "outline"}
+                  className="mx-auto"
+                >
+                  {currentPlayer === username
+                    ? "Your turn"
+                    : `${currentPlayer}'s turn`}
+                </Badge>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="board mx-auto">
+              {board.map((row, rowIndex) => (
+                <div key={rowIndex} className="flex">
+                  {row.map((cell, colIndex) => (
+                    <div
+                      key={colIndex}
+                      className={`game-cell ${
+                        cell
+                          ? cell === "X"
+                            ? "x-cell"
+                            : "o-cell"
+                          : "empty-cell"
+                      } ${
+                        currentPlayer === username &&
+                        !cell &&
+                        !winner &&
+                        !isDraw
+                          ? "hover:bg-slate-100"
+                          : ""
+                      }`}
+                      onClick={() => handleCellClick(rowIndex, colIndex)}
+                    >
+                      {cell}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            {winner && (
+              <Alert className="mt-4 bg-green-50 border-green-500">
+                <AlertDescription className="text-center">
+                  {winner === username ? "You win! 🎉" : `${winner} wins!`}
+                </AlertDescription>
+              </Alert>
+            )}
+            {isDraw && (
+              <Alert className="mt-4 bg-yellow-50 border-yellow-500">
+                <AlertDescription className="text-center">
+                  It's a draw!
+                </AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+          {(winner || isDraw) && (
+            <CardFooter>
+              <Button onClick={resetGame} className="w-full">
+                Play Again
+              </Button>
+            </CardFooter>
+          )}
+        </Card>
       )}
     </div>
   );
