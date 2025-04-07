@@ -104,9 +104,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg relative flex items-center justify-center p-4">
+      <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:35px_35px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-20 select-none pointer-events-none" />
       {!gameStarted ? (
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md z-10">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">Tic Tac Toe</CardTitle>
             <CardDescription>
@@ -147,7 +148,7 @@ function App() {
           </CardFooter>
         </Card>
       ) : (
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md z-10">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">
               Tic Tac Toe
