@@ -13,6 +13,11 @@ import {
 import { Badge } from "./components/ui/badge";
 import { Alert, AlertDescription } from "./components/ui/alert";
 import { cn } from "./lib/utils";
+import cross from "@/assets/cross.png";
+import circle from "@/assets/circle.png";
+import gamepad from "@/assets/gamepad.png";
+import ttt1 from "@/assets/5701567.webp";
+import ttt2 from "@/assets/8726950.webp";
 
 const socket = io("http://localhost:4000");
 
@@ -106,6 +111,43 @@ function App() {
   return (
     <div className="min-h-screen bg relative flex items-center justify-center p-4">
       <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:35px_35px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-20 select-none pointer-events-none" />
+      <img
+        src={cross}
+        alt=""
+        className="absolute w-40 top-20 left-20"
+        fetchPriority="low"
+      />
+      <img
+        fetchPriority="low"
+        src={ttt1}
+        alt=""
+        className="absolute w-40 bottom-20 left-20"
+      />
+      <img
+        fetchPriority="low"
+        src={ttt2}
+        alt=""
+        className="absolute w-40 left-20 -scale-x-100"
+      />
+      <img
+        fetchPriority="low"
+        src={ttt1}
+        alt=""
+        className="absolute w-40 right-20 -scale-x-100"
+      />
+
+      <img
+        fetchPriority="low"
+        src={circle}
+        alt=""
+        className="absolute w-40 bottom-20 right-20"
+      />
+      <img
+        fetchPriority="low"
+        src={gamepad}
+        alt=""
+        className="absolute w-40 top-20 right-20"
+      />
       {!gameStarted ? (
         <Card className="w-full max-w-md z-10">
           <CardHeader>
@@ -195,7 +237,7 @@ function App() {
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     className={cn(
-                      "flex items-center border-border/60 border justify-center size-20 text-5xl font-bold rounded-lg shadow cursor-pointer transition-all duration-200 ease-in-out",
+                      "flex items-center border-border/60 border justify-center size-20 rounded-lg shadow cursor-pointer transition-all duration-200 ease-in-out relative",
                       cell === "X"
                         ? "text-red-600"
                         : cell === "O"
@@ -207,7 +249,21 @@ function App() {
                     )}
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                   >
-                    {cell}
+                    {/* {cell} */}
+                    {cell === "X" && (
+                      <img
+                        src={cross}
+                        alt="cross"
+                        className="w-16 absolute hover:rotate-6 transition-all duration-300"
+                      />
+                    )}
+                    {cell === "O" && (
+                      <img
+                        src={circle}
+                        alt="circle"
+                        className="w-15 absolute hover:rotate-12 transition-all duration-300"
+                      />
+                    )}
                   </div>
                 ))
               )}
