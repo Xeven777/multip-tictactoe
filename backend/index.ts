@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { Board, checkWinner, Games } from "./misc.js";
+import { checkWinner, Games } from "./misc.js";
 
 const games: Games = {};
 
@@ -111,16 +111,22 @@ io.on("connection", (socket) => {
       game.winner = winner;
     }
 
-    game.currentPlayer =
-      game.currentPlayer === game.players[0]
-        ? game.players[1]
-        : game.players[0];
+    const isDraw = game.movesMade === 9 && !winner;
+
+    if (!winner && !isDraw) {
+      game.currentPlayer =
+        game.currentPlayer === game.players[0]
+          ? game.players[1]
+          : game.players[0];
+    } else if (isDraw) {
+      game.winner = "draw";
+    }
 
     io.to(room).emit("moveMade", {
       board: game.board,
       currentPlayer: game.currentPlayer,
       winner: game.winner,
-      isDraw: game.movesMade === 9 && !winner,
+      isDraw: isDraw,
     });
 
     console.log(`Move made in room ${room}:`, game);

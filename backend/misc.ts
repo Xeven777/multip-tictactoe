@@ -2,7 +2,7 @@ interface GameState {
   board: string[][];
   players: (string | null)[];
   currentPlayer: string | null;
-  winner: string | null;
+  winner: string | null | "draw";
   movesMade: number;
 }
 
