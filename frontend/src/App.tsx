@@ -1,4 +1,3 @@
-// App.tsx (Modified)
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { Button } from "./components/ui/button";
@@ -13,6 +12,7 @@ import {
 } from "./components/ui/card";
 import { Badge } from "./components/ui/badge";
 import { Alert, AlertDescription } from "./components/ui/alert";
+import { cn } from "./lib/utils";
 
 const socket = io("http://localhost:4000");
 
@@ -188,35 +188,30 @@ function App() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="board mx-auto">
-              {board.map((row, rowIndex) => (
-                <div key={rowIndex} className="flex">
-                  {row.map((cell, colIndex) => (
-                    <div
-                      key={colIndex}
-                      className={`game-cell ${
-                        cell
-                          ? cell === "X"
-                            ? "x-cell"
-                            : "o-cell"
-                          : "empty-cell"
-                      } ${
-                        currentPlayer === username &&
-                        !cell &&
-                        !winner &&
-                        !isDraw
-                          ? "hover:bg-slate-100"
-                          : ""
-                      }`}
-                      onClick={() => handleCellClick(rowIndex, colIndex)}
-                    >
-                      {cell}
-                    </div>
-                  ))}
-                </div>
-              ))}
+            <div className="grid grid-cols-3 my-4 place-items-center gap-4 max-w-fit mx-auto">
+              {board.map((row, rowIndex) =>
+                row.map((cell, colIndex) => (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    className={cn(
+                      "flex items-center border-border/60 border justify-center size-20 text-5xl font-bold rounded-lg shadow cursor-pointer transition-all duration-200 ease-in-out",
+                      cell === "X"
+                        ? "text-red-600"
+                        : cell === "O"
+                        ? "text-blue-600"
+                        : "text-gray-900",
+                      !cell && !winner && !isDraw && currentPlayer === username
+                        ? "hover:scale-105 active:scale-100"
+                        : "bg-slate-100"
+                    )}
+                    onClick={() => handleCellClick(rowIndex, colIndex)}
+                  >
+                    {cell}
+                  </div>
+                ))
+              )}
             </div>
-            {winner && (
+            {winner && !isDraw && (
               <Alert className="mt-4 bg-green-50 border-green-500">
                 <AlertDescription className="text-center">
                   {winner === username ? "You win! 🎉" : `${winner} wins!`}
