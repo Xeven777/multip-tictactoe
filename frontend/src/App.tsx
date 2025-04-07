@@ -1,3 +1,4 @@
+// App.tsx (Modified)
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { Button } from "./components/ui/button";
@@ -42,6 +43,7 @@ function App() {
 
     socket.on("gameCreated", () => {
       setGameCreated(true);
+      setGameStarted(true);
     });
 
     socket.on("gameStart", (data) => {
@@ -150,22 +152,28 @@ function App() {
             <CardTitle className="text-2xl font-bold text-center">
               Tic Tac Toe
             </CardTitle>
-            <div className="flex justify-center space-x-6 mt-2">
-              <div className="text-center">
-                <div className="flex text-4xl font-extrabold text-white items-center justify-center size-20 rounded-full bg-red-500/90">
-                  X
+            {gameCreated && players.length < 2 ? (
+              <AlertDescription className="text-center text-slate-500">
+                Waiting for Player 2 to join...
+              </AlertDescription>
+            ) : (
+              <div className="flex justify-center space-x-6 mt-2">
+                <div className="text-center">
+                  <div className="flex text-4xl font-extrabold text-white items-center justify-center size-20 rounded-full bg-red-500/90">
+                    X
+                  </div>
+                  <p className="text-sm font-medium">{players[0]}</p>
                 </div>
-                <p className="text-sm font-medium">{players[0]}</p>
-              </div>
-              <div className="text-center">
-                <div className="flex text-4xl font-extrabold text-white items-center justify-center size-20 rounded-full bg-blue-500/90">
-                  O
+                <div className="text-center">
+                  <div className="flex text-4xl font-extrabold text-white items-center justify-center size-20 rounded-full bg-blue-500/90">
+                    O
+                  </div>
+                  <p className="text-sm font-medium">
+                    {players[1] || "Waiting..."}
+                  </p>
                 </div>
-                <p className="text-sm font-medium">
-                  {players[1] || "Waiting..."}
-                </p>
               </div>
-            </div>
+            )}
             <div className="flex justify-center mt-2">
               {currentPlayer && (
                 <Badge
