@@ -114,39 +114,39 @@ function App() {
       <img
         src={cross}
         alt=""
-        className="absolute w-40 top-20 left-20"
+        className="absolute w-44 top-12 left-12 sm:top-20 sm:left-32"
         fetchPriority="low"
       />
       <img
         fetchPriority="low"
         src={ttt1}
         alt=""
-        className="absolute w-40 bottom-20 left-20"
+        className="absolute w-0 sm:w-44 bottom-20 left-36 hidden sm:block"
       />
       <img
         fetchPriority="low"
         src={ttt2}
         alt=""
-        className="absolute w-40 left-20 -scale-x-100"
+        className="absolute w-0 sm:w-44 left-48 -scale-x-100 hidden sm:block"
       />
       <img
         fetchPriority="low"
         src={ttt1}
         alt=""
-        className="absolute w-40 right-20 -scale-x-100"
+        className="absolute w-0 sm:w-44 right-56 -scale-x-100 hidden sm:block"
       />
 
       <img
         fetchPriority="low"
         src={circle}
         alt=""
-        className="absolute w-40 bottom-20 right-20"
+        className="absolute w-44 bottom-12 right-12 sm:bottom-20 sm:right-36"
       />
       <img
         fetchPriority="low"
         src={gamepad}
         alt=""
-        className="absolute w-40 top-20 right-20"
+        className="absolute w-0 sm:w-52 top-20 right-28 hidden sm:block"
       />
       {!gameStarted ? (
         <Card className="w-full max-w-md z-10">
