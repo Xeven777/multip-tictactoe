@@ -1,68 +1,33 @@
-# Ghibli Styled Chat Application
+# Tic Tac Toe Online Game 🕹️
 
-A real-time chat application built with Node.js, Express, Socket.IO, React, and TypeScript.
+A real-time multiplayer Tic Tac Toe game built with React ⚛️, Node.js ⚙️, Express 🚀, Socket.IO 🌐, and TypeScript 🛡️. Play with your friends and have fun! 🎉
 
-![ss](frontend/public/og-img.jpg)
+![Tic Tac Toe](frontend/public/og-img.png)
 
-## Project Structure
+## Tech Stack 💻
+
+- **Frontend**: React, Vite, Tailwind CSS, Socket.IO Client
+- **Backend**: Node.js, Express, Socket.IO, TypeScript
+
+## Project Structure 📂
 
 - `frontend/`: React frontend built with Vite
 - `backend/`: Node.js backend with Socket.IO
 
-## Development
+## Development 🛠️
 
-### Backend
-
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Deployment to AWS Elastic Beanstalk
-
-### Prerequisites
-
-1. Install the AWS CLI and Elastic Beanstalk CLI
-2. Configure AWS credentials with `aws configure`
-
-### Backend Deployment
+### Backend ⚙️
 
 ```bash
 cd backend
-npm install
-npm run build
-eb init  # First time only
-eb deploy
+bun install
+bun run dev
 ```
 
-### Frontend Deployment
-
-1. Update the API URL in `.env.production` with your Elastic Beanstalk URL
-2. Build the frontend:
+### Frontend ⚛️
 
 ```bash
 cd frontend
-npm install
-npm run build
+bun install
+bun run dev
 ```
-
-3. Deploy the `dist` folder to your preferred static hosting service (AWS S3, Netlify, Vercel, etc.)
-
-## Environment Variables
-
-### Backend
-
-- `PORT`: The port the server will run on (default: 4000)
-
-### Frontend
-
-- `VITE_API_URL`: The URL of the backend API
