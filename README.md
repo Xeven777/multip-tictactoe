@@ -4,6 +4,8 @@ A real-time multiplayer Tic Tac Toe game built with React ⚛️, Node.js ⚙️
 
 ![Tic Tac Toe](frontend/public/og-img.png)
 
+Link : [Tic-Tac-Toe](https://online-tictactoe7.netlify.app/)
+
 ## Tech Stack 💻
 
 - **Frontend**: React, Vite, Tailwind CSS, Socket.IO Client

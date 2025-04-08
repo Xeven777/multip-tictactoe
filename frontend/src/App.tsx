@@ -19,6 +19,10 @@ import ttt1 from "@/assets/5701567.webp";
 import ttt2 from "@/assets/8726950.webp";
 import StitchesButton from "./components/ui/StichesBtn";
 import { Confetti, ConfettiRef } from "./components/magicui/confetti";
+import { Copy, Dices } from "lucide-react";
+import { Toaster } from "./components/ui/sonner";
+import { uniqueNamesGenerator, colors, animals } from "unique-names-generator";
+import { toast } from "sonner";
 
 const socket = io(
   import.meta.env.DEV
@@ -41,21 +45,26 @@ function App() {
   const [gameCreated, setGameCreated] = useState(false);
   const [players, setPlayers] = useState([]);
   const [roomFullMessage, setRoomFullMessage] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [roomError, setRoomError] = useState("");
 
   const confettiRef = useRef<ConfettiRef>(null);
 
   useEffect(() => {
     socket.on("connect", () => {
       console.log("Connected to server");
+      toast.success("Connected to server");
     });
 
     socket.on("disconnect", () => {
       console.log("Disconnected from server");
+      toast.error("Disconnected from server");
     });
 
     socket.on("gameCreated", () => {
       setGameCreated(true);
       setGameStarted(true);
+      toast.success("Game created successfully!");
     });
 
     socket.on("gameStart", (data) => {
@@ -63,6 +72,7 @@ function App() {
       setCurrentPlayer(data.currentPlayer);
       setPlayers(data.players);
       setGameStarted(true);
+      toast.success("Game started!");
     });
 
     socket.on("moveMade", (data) => {
@@ -73,6 +83,21 @@ function App() {
 
       if (data.winner && !data.isDraw) {
         setTimeout(() => confettiRef.current?.fire({}), 300);
+        const isUserWinner =
+          (data.winner === "X" && players[0] === username) ||
+          (data.winner === "O" && players[1] === username);
+
+        if (isUserWinner) {
+          toast.success("You won! 🎉");
+        } else if (data.winner) {
+          toast.success(
+            `${data.winner === "X" ? players[0] : players[1]} wins!`
+          );
+        }
+      }
+
+      if (data.isDraw) {
+        toast.info("It's a draw!");
       }
     });
 
@@ -81,21 +106,24 @@ function App() {
       setCurrentPlayer(data.currentPlayer);
       setWinner(data.winner);
       setIsDraw(false);
+      toast.info("Game reset");
     });
 
     socket.on("roomFull", (data) => {
       setRoomFullMessage(data.message);
+      toast.error(data.message);
     });
 
     return () => {
       socket.off("connect");
       socket.off("disconnect");
+      socket.off("gameCreated");
       socket.off("gameStart");
       socket.off("moveMade");
       socket.off("gameReset");
       socket.off("roomFull");
     };
-  }, []);
+  }, [players, username]);
 
   const joinGame = () => {
     if (username !== "" && room !== "") {
@@ -119,8 +147,57 @@ function App() {
     socket.emit("resetGame", { room });
   };
 
+  const validateForm = () => {
+    let isValid = true;
+    if (username.length < 2) {
+      setUsernameError("Username must be at least 2 characters");
+      isValid = false;
+    } else {
+      setUsernameError("");
+    }
+
+    if (room.length < 2) {
+      setRoomError("Room ID must be at least 2 characters");
+      isValid = false;
+    } else {
+      setRoomError("");
+    }
+    return isValid;
+  };
+
+  const handleJoinGame = () => {
+    if (validateForm()) {
+      joinGame();
+    }
+  };
+
+  const copyRoomId = () => {
+    navigator.clipboard.writeText(room);
+    toast.success("Room ID copied to clipboard!");
+  };
+
+  const generateRandomUsername = () => {
+    const randomName = uniqueNamesGenerator({
+      dictionaries: [colors, animals],
+      separator: "",
+      style: "capital",
+      length: 2,
+    });
+    setUsername(randomName);
+  };
+
+  const generateRandomRoom = () => {
+    const randomRoom = uniqueNamesGenerator({
+      dictionaries: [colors, animals],
+      separator: "-",
+      length: 2,
+    });
+    setRoom(randomRoom);
+  };
+
   return (
     <div className="min-h-screen bg relative flex items-center justify-center p-4">
+      <Toaster position="top-center" richColors theme="light" />
       <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:35px_35px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-20 select-none pointer-events-none" />
       <img
         src={cross}
@@ -172,21 +249,57 @@ function App() {
               <label htmlFor="username" className="text-sm font-medium">
                 Username
               </label>
-              <Input
-                id="username"
-                placeholder="Enter your username"
-                onChange={(event) => setUsername(event.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="username"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(event) => setUsername(event.target.value)}
+                />
+                <button
+                  title="Generate Random Username"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-md hover:bg-violet-100 cursor-pointer active:scale-95 transition-all duration-200 ease-in-out"
+                  onClick={generateRandomUsername}
+                  type="button"
+                >
+                  <Dices className="size-4" />
+                </button>
+              </div>
+              {usernameError && (
+                <p className="text-red-500 text-sm">{usernameError}</p>
+              )}
             </div>
             <div className="space-y-2">
               <label htmlFor="room" className="text-sm font-medium">
                 Room ID
               </label>
-              <Input
-                id="room"
-                placeholder="Enter room ID or create a new one"
-                onChange={(event) => setRoom(event.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="room"
+                  placeholder="Enter room ID or create a new one"
+                  value={room}
+                  onChange={(event) => setRoom(event.target.value)}
+                />
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex">
+                  <button
+                    title="Copy Room ID"
+                    className="p-2 rounded-md hover:bg-violet-100 cursor-pointer active:scale-95 transition-all duration-200 ease-in-out"
+                    onClick={copyRoomId}
+                    type="button"
+                  >
+                    <Copy className="size-4" />
+                  </button>
+                  <button
+                    title="Generate Random Room ID"
+                    className="p-2 rounded-md hover:bg-violet-100 cursor-pointer active:scale-95 transition-all duration-200 ease-in-out"
+                    onClick={generateRandomRoom}
+                    type="button"
+                  >
+                    <Dices className="size-4" />
+                  </button>
+                </div>
+              </div>
+              {roomError && <p className="text-red-500 text-sm">{roomError}</p>}
             </div>
             {roomFullMessage && (
               <Alert variant="destructive">
@@ -197,7 +310,7 @@ function App() {
           <CardFooter>
             <StitchesButton
               text="Join Game"
-              onClick={joinGame}
+              onClick={handleJoinGame}
               className="w-full"
               disabled={!username || !room}
             />
