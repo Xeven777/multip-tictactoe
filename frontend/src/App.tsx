@@ -239,18 +239,21 @@ function App() {
       {!gameStarted ? (
         <Card className="w-full max-w-md z-10 py-10">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold">Tic Tac Toe</CardTitle>
+            <CardTitle className="text-2xl md:text-3xl font-bold tracking-tighter bg-gradient-to-r from-sky-500 via-rose-400 to-indigo-500 px-1 w-fit text-transparent bg-clip-text ">
+              Tic Tac Toe
+            </CardTitle>
             <CardDescription>
               Join an existing game or create a new one
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-medium">
+              <label htmlFor="username" className="text-sm font-medium pl-3">
                 Username
               </label>
               <div className="relative">
                 <Input
+                  className="text-sm placeholder:text-xs"
                   id="username"
                   placeholder="Enter your username"
                   value={username}
@@ -270,11 +273,12 @@ function App() {
               )}
             </div>
             <div className="space-y-2">
-              <label htmlFor="room" className="text-sm font-medium">
+              <label htmlFor="room" className="text-sm font-medium pl-3">
                 Room ID
               </label>
               <div className="relative">
                 <Input
+                  className="text-sm pr-16 placeholder:text-xs"
                   id="room"
                   placeholder="Enter room ID or create a new one"
                   value={room}
@@ -319,7 +323,7 @@ function App() {
       ) : (
         <Card className="w-full max-w-md z-10 py-10">
           <CardHeader className="flex flex-col items-center">
-            <CardTitle className="text-3xl font-bold text-center">
+            <CardTitle className="text-2xl md:text-3xl font-bold tracking-tighter bg-gradient-to-r from-sky-500 via-rose-400 to-indigo-500 px-1 w-fit text-transparent bg-clip-text ">
               Tic Tac Toe
             </CardTitle>
             {gameCreated && players.length < 2 ? (
@@ -327,14 +331,14 @@ function App() {
                 Waiting for Player 2 to join...
               </AlertDescription>
             ) : (
-              <div className="flex justify-center space-x-6 mt-2">
-                <div className="text-center">
+              <div className="flex justify-center gap-8 md:gap-14 mt-2">
+                <div className="text-center flex flex-col items-center">
                   <div className="flex text-4xl font-extrabold text-white items-center justify-center size-20 rounded-full bg-red-500/90">
                     X
                   </div>
                   <p className="text-sm font-medium">{players[0]}</p>
                 </div>
-                <div className="text-center">
+                <div className="text-center flex flex-col items-center">
                   <div className="flex text-4xl font-extrabold text-white items-center justify-center size-20 rounded-full bg-blue-500/90">
                     O
                   </div>
