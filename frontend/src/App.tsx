@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import {
   Card,
@@ -18,6 +17,8 @@ import circle from "@/assets/circle.png";
 import gamepad from "@/assets/gamepad.png";
 import ttt1 from "@/assets/5701567.webp";
 import ttt2 from "@/assets/8726950.webp";
+import StitchesButton from "./components/ui/StichesBtn";
+import { Confetti, ConfettiRef } from "./components/magicui/confetti";
 
 const socket = io("http://localhost:4000");
 
@@ -36,6 +37,8 @@ function App() {
   const [gameCreated, setGameCreated] = useState(false);
   const [players, setPlayers] = useState([]);
   const [roomFullMessage, setRoomFullMessage] = useState("");
+
+  const confettiRef = useRef<ConfettiRef>(null);
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -63,6 +66,11 @@ function App() {
       setCurrentPlayer(data.currentPlayer);
       setWinner(data.winner);
       setIsDraw(data.isDraw);
+
+      // Auto-trigger confetti when there's a winner
+      if (data.winner && !data.isDraw) {
+        setTimeout(() => confettiRef.current?.fire({}), 300);
+      }
     });
 
     socket.on("gameReset", (data) => {
@@ -149,9 +157,9 @@ function App() {
         className="absolute w-0 sm:w-52 top-20 right-28 hidden sm:block"
       />
       {!gameStarted ? (
-        <Card className="w-full max-w-md z-10">
+        <Card className="w-full max-w-md z-10 py-10">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">Tic Tac Toe</CardTitle>
+            <CardTitle className="text-3xl font-bold">Tic Tac Toe</CardTitle>
             <CardDescription>
               Join an existing game or create a new one
             </CardDescription>
@@ -184,19 +192,22 @@ function App() {
             )}
           </CardContent>
           <CardFooter>
-            <Button onClick={joinGame} className="w-full">
-              Join Game
-            </Button>
+            <StitchesButton
+              text="Join Game"
+              onClick={joinGame}
+              className="w-full"
+              disabled={!username || !room}
+            />
           </CardFooter>
         </Card>
       ) : (
-        <Card className="w-full max-w-md z-10">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">
+        <Card className="w-full max-w-md z-10 py-10">
+          <CardHeader className="flex flex-col items-center">
+            <CardTitle className="text-3xl font-bold text-center">
               Tic Tac Toe
             </CardTitle>
             {gameCreated && players.length < 2 ? (
-              <AlertDescription className="text-center text-slate-500">
+              <AlertDescription className="text-center text-muted-foreground animate-pulse">
                 Waiting for Player 2 to join...
               </AlertDescription>
             ) : (
@@ -270,14 +281,29 @@ function App() {
             </div>
             {winner && !isDraw && (
               <Alert className="mt-4 bg-green-50 border-green-500">
-                <AlertDescription className="text-center">
-                  {winner === username ? "You win! 🎉" : `${winner} wins!`}
+                <Confetti
+                  options={{
+                    particleCount: 60,
+                    spread: 70,
+                    startVelocity: 30,
+                  }}
+                  ref={confettiRef}
+                  className="absolute left-0 top-0 z-0 size-full"
+                />
+                <AlertDescription className="text-center text-2xl font-semibold tracking-tight text-green-700">
+                  {winner === "X"
+                    ? players[0] === username
+                      ? "You win! 🎉"
+                      : `${players[0]} wins!`
+                    : players[1] === username
+                    ? "You win! 🎉"
+                    : `${players[1]} wins!`}
                 </AlertDescription>
               </Alert>
             )}
             {isDraw && (
               <Alert className="mt-4 bg-yellow-50 border-yellow-500">
-                <AlertDescription className="text-center">
+                <AlertDescription className="text-center text-2xl font-semibold tracking-tight text-yellow-700">
                   It's a draw!
                 </AlertDescription>
               </Alert>
@@ -285,9 +311,11 @@ function App() {
           </CardContent>
           {(winner || isDraw) && (
             <CardFooter>
-              <Button onClick={resetGame} className="w-full">
-                Play Again
-              </Button>
+              <StitchesButton
+                text="Play Again !"
+                onClick={resetGame}
+                className="w-full bg-yellow-600 border-yellow-600"
+              />
             </CardFooter>
           )}
         </Card>
