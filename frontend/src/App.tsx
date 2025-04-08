@@ -20,7 +20,11 @@ import ttt2 from "@/assets/8726950.webp";
 import StitchesButton from "./components/ui/StichesBtn";
 import { Confetti, ConfettiRef } from "./components/magicui/confetti";
 
-const socket = io("http://localhost:4000");
+const socket = io(
+  import.meta.env.DEV
+    ? "http://localhost:4000"
+    : "https://multip-tictactoe.onrender.com"
+);
 
 function App() {
   const [username, setUsername] = useState("");
@@ -67,7 +71,6 @@ function App() {
       setWinner(data.winner);
       setIsDraw(data.isDraw);
 
-      // Auto-trigger confetti when there's a winner
       if (data.winner && !data.isDraw) {
         setTimeout(() => confettiRef.current?.fire({}), 300);
       }
